@@ -23,4 +23,8 @@ contract Deed {
         beneficiary.transfer(address(this).balance);
     }
     
+    function balanceOfContract() view public returns(uint) {
+        return(address(this).balance);
+    }
+    
 }
