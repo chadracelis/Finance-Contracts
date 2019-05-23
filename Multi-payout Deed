@@ -5,7 +5,7 @@ contract DeedMultiPayout {
   address payable public beneficiary;
   uint public earliest;
   uint public amount;
-  uint constant public PAYOUTS = 10; // Permitted payouts at a time
+  uint constant public PAYOUTS = 10; // Amount of payouts
   uint constant public INTERVAL = 10; // Duration per payout
   uint public paidPayouts;
   
@@ -26,10 +26,18 @@ contract DeedMultiPayout {
     require(now >= earliest, 'Too early for a payout!');
     require(paidPayouts < PAYOUTS, 'No payouts left :(');
     
-    uint elligiblePayouts = (now - earliest) / INTERVAL; // Ex: 40s (Now) - 10s (Earliest) = 30s / 10s (Interval) = 3 elligiblePayouts
+    uint elligiblePayouts = (now - earliest) / INTERVAL; 
+    // Ex: 40s (Now) - 10s (Earliest) = 30s / 10s (Interval) = 3 elligiblePayouts
+    
     uint duePayouts = elligiblePayouts - paidPayouts; 
+    // Ex cont: 3 elligiblePayouts - 1 paidPayouts = 2 duePayouts
+    
     duePayouts = duePayouts + paidPayouts > PAYOUTS ? PAYOUTS - paidPayouts : duePayouts;
+    // Ex cont: If 3 duePayouts + 1 paidPayouts > greather than 10 total PAYOUTS is not true, then 10 total PAYOUTS - 1 paidPayouts = duePayouts
+    
     paidPayouts += duePayouts;
+    // Ex cont: paidPayouts = paidPayouts + duePayouts
+    
     beneficiary.transfer(duePayouts * amount);
   }
 }
