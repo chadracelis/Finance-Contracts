@@ -1,0 +1,26 @@
+pragma solidity >=0.4.0 <0.6.0;
+
+contract Deed {
+    
+    address public lawyer;
+    address payable public beneficiary;
+    uint public earliest;
+    
+    constructor(
+        address _lawyer,
+        address payable _beneficiary,
+        uint fromNow)
+        payable
+        public {
+            lawyer = _lawyer;
+            beneficiary = _beneficiary;
+            earliest = fromNow + now;
+        }
+        
+    function withdraw() public {
+        require(msg.sender == lawyer, 'You are not the lawyer!');
+        require(now >= earliest, 'It is too early!');
+        beneficiary.transfer(address(this).balance);
+    }
+    
+}
