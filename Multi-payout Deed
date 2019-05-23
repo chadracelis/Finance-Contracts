@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 contract DeedMultiPayout {
   address public lawyer;
   address payable public beneficiary;
-  uint public earliest;
+  uint public earliest; // Earliest time for first payout
   uint public amount;
   uint constant public PAYOUTS = 10; // Amount of payouts
   uint constant public INTERVAL = 10; // Duration in seconds per payout
@@ -24,7 +24,7 @@ contract DeedMultiPayout {
   function withdraw() public {
     require(msg.sender == beneficiary, 'You are not the beneficiary!');
     require(now >= earliest, 'Too early for a payout!');
-    require(paidPayouts < PAYOUTS, 'No payouts left :(');
+    require(paidPayouts < PAYOUTS, 'No payouts left :(' );
     
     uint elligiblePayouts = (now - earliest) / INTERVAL; 
     // Ex: 40s (Now) - 10s (Earliest) = 30s / 10s (Interval) = 3 elligiblePayouts
