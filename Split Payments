@@ -1,5 +1,7 @@
 pragma solidity >=0.4.0 <0.6.0;
 
+// A practical contract that can be used by companies that need to make multiple payments to multiple parties in a single transaction
+
 contract SplitPayment {
     
     address owner;
@@ -20,3 +22,4 @@ contract SplitPayment {
         }
     }
 }
+
