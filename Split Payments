@@ -23,3 +23,6 @@ contract SplitPayment {
     }
 }
 
+// Deploy contract
+// Use the send function with the following array of arguments ["party 1 address", "party address 2", "etc"], [party 1 payment, party 2 payment, etc]
+
