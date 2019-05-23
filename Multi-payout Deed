@@ -34,6 +34,7 @@ contract DeedMultiPayout {
     
     duePayouts = duePayouts + paidPayouts > PAYOUTS ? PAYOUTS - paidPayouts : duePayouts;
     // If duePayouts + paidPayouts exceeds 10 total PAYOUTS, then 10 total PAYOUTS - paidPayouts = duePayouts
+    // Else revert to duePayouts
     
     paidPayouts += duePayouts;
     // paidPayouts = paidPayouts + duePayouts
