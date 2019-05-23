@@ -28,3 +28,6 @@ contract Deed {
     }
     
 }
+
+// Add value of the inheritance in ether
+// Deploy contract with arguments of "Address of lawyer", "Address of beneficiary", "Time in seconds before permitted withdrawal"
