@@ -6,7 +6,7 @@ contract DeedMultiPayout {
   uint public earliest;
   uint public amount;
   uint constant public PAYOUTS = 10; // Amount of payouts
-  uint constant public INTERVAL = 10; // Duration per payout
+  uint constant public INTERVAL = 10; // Duration in seconds per payout
   uint public paidPayouts;
   
   constructor(
@@ -33,10 +33,10 @@ contract DeedMultiPayout {
     // Ex cont: 3 elligiblePayouts - 1 paidPayouts = 2 duePayouts
     
     duePayouts = duePayouts + paidPayouts > PAYOUTS ? PAYOUTS - paidPayouts : duePayouts;
-    // Ex cont: If 3 duePayouts + 1 paidPayouts > greather than 10 total PAYOUTS is not true, then 10 total PAYOUTS - 1 paidPayouts = duePayouts
+    // If duePayouts + paidPayouts exceeds 10 total PAYOUTS, then 10 total PAYOUTS - paidPayouts = duePayouts
     
     paidPayouts += duePayouts;
-    // Ex cont: paidPayouts = paidPayouts + duePayouts
+    // paidPayouts = paidPayouts + duePayouts
     
     beneficiary.transfer(duePayouts * amount);
   }
