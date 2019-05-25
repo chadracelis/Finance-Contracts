@@ -72,4 +72,4 @@ contract Multisig {
 
 // INTERACTION
 // 1. As one of the approvers, go to createTransfer function and input the following arguments, 'amount to send, "recipient address' and click function
-// 2. Change address to another approver and go to sendTransfer function. Input the id of transfer and click function
+// 2. Change address to another approver and go to sendTransfer function. Input the id of transfer and click function. Repeat with another approver address
