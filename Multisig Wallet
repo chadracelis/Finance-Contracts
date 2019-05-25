@@ -1,0 +1,75 @@
+pragma solidity ^0.5.2;
+
+// A wallet which requires two or more private keys aka approvers to submit a transaction
+
+contract Multisig {
+    
+    struct Transfer {
+        uint id;
+        uint amount;
+        address payable to;
+        uint approvals;
+        bool sent;
+    }
+    
+    address[] public approvers;
+    uint public quorum;
+    uint nextId = 1;
+    
+    mapping(uint => Transfer) transfers;
+    mapping(address => mapping(uint => bool)) approvals;
+    
+    constructor(address[] memory _approvers, uint _quorum) payable public {
+        approvers = _approvers;
+        quorum = _quorum;
+    }
+    
+    modifier onlyApprover {
+        bool allowed = false;
+        for(uint i = 0; i < approvers.length; i++) {
+            if(approvers[i] == msg.sender) {
+                allowed = true;
+            }
+        }
+        require(allowed == true, 'only approver allowed');
+        _;
+    }
+    
+    function createTransfer(uint amount, address payable to) external onlyApprover {
+        transfers[nextId] = Transfer(
+            nextId,
+            amount,
+            to,
+            0,
+            false);
+        nextId++;
+    }
+    
+    function sendTransfer(uint id) external onlyApprover {
+        require(transfers[id].sent == false, 'Transfer has already been sent!');
+        if(approvals[msg.sender][id] == false) {
+          approvals[msg.sender][id] = true;
+          transfers[id].approvals++;
+        }
+        if(transfers[id].approvals >= quorum) {
+          transfers[id].sent = true;
+          address payable to = transfers[id].to;
+          uint amount = transfers[id].amount;
+          to.transfer(amount);
+          return;
+        }
+   }
+   
+   function balanceOf() view public returns(uint) {
+       return address(this).balance;
+   }
+    
+}
+
+// DEPLOYMENT
+// 1. Deploy contract with the following array of arguments => '["approver address 1", "approver address 2", "etc"], amount of approvals required'
+// 2. And amount in ether you want to add to wallet
+
+// INTERACTION
+// 1. As one of the approvers, go to createTransfer function and input the following arguments, 'amount to send, "recipient address' and click function
+// 2. Change address to another approver and go to sendTransfer function. Input the id of transfer and click function
