@@ -39,7 +39,7 @@ contract DAO {
     uint _voteTime,
     uint _quorum) 
     public {
-    require(_quorum > 0 && _quorum < 100, 'quorum must be between 0 and 100');
+    require(_quorum > 0 && _quorum < 100, 'Quorum must be between 0 and 100 Percent');
     contributionEnd = now + contributionTime;
     voteTime = _voteTime;
     quorum = _quorum;
@@ -47,18 +47,18 @@ contract DAO {
   }
   
   modifier onlyInvestors() {
-    require(investors[msg.sender] == true, 'only investors');
+    require(investors[msg.sender] == true, 'You are not an investor!');
     _;
   }
 
   modifier onlyAdmin() {
-    require(msg.sender == admin, 'only admin');
+    require(msg.sender == admin, 'You are not the admin!');
     _;
   }
 
 
   function contribute() payable external {
-    require(now < contributionEnd, 'cannot contribute after contributionEnd');
+    require(now < contributionEnd, 'Contribution time hads ended');
     investors[msg.sender] = true;
     shares[msg.sender] += msg.value;
     totalShares += msg.value;
@@ -66,15 +66,15 @@ contract DAO {
   }
 
   function redeemShare(uint amount) external {
-    require(shares[msg.sender] >= amount, 'not enough shares');
-    require(availableFunds >= amount, 'not enough available funds');
+    require(shares[msg.sender] >= amount, 'Not enough shares');
+    require(availableFunds >= amount, 'Not enough available funds');
     shares[msg.sender] -= amount;
     availableFunds -= amount;
     msg.sender.transfer(amount);
   }
     
   function transferShare(uint amount, address to) external {
-    require(shares[msg.sender] >= amount, 'not enough shares');
+    require(shares[msg.sender] >= amount, 'Not enough shares');
     shares[msg.sender] -= amount;
     shares[to] += amount;
     investors[to] = true;
@@ -86,7 +86,7 @@ contract DAO {
     address payable recipient) 
     public 
     onlyInvestors() {
-    require(availableFunds >= amount, 'amount too big');
+    require(availableFunds >= amount, 'Amount too big');
     proposals[nextProposalId] = Proposal(
       nextProposalId,
       name,
@@ -94,25 +94,24 @@ contract DAO {
       recipient,
       0,
       now + voteTime,
-      false
-    );
+      false);
     availableFunds -= amount;
     nextProposalId++;
   }
 
   function vote(uint proposalId) external onlyInvestors() {
     Proposal storage proposal = proposals[proposalId];
-    require(votes[msg.sender][proposalId] == false, 'investor can only vote once for a proposal');
-    require(now < proposal.end, 'can only vote until proposal end date');
+    require(votes[msg.sender][proposalId] == false, 'You already voted!');
+    require(now < proposal.end, 'Voting has ended!');
     votes[msg.sender][proposalId] = true;
     proposal.votes += shares[msg.sender];
   }
 
   function executeProposal(uint proposalId) external onlyAdmin() {
     Proposal storage proposal = proposals[proposalId];
-    require(now >= proposal.end, 'cannot execute proposal before end date');
-    require(proposal.executed == false, 'cannot execute proposal already executed');
-    require((proposal.votes / totalShares) * 100 >= quorum, 'cannot execute proposal with votes # below quorum');
+    require(now >= proposal.end, 'Voting has not ended!');
+    require(proposal.executed == false, 'Proposal has already been executed!');
+    require((proposal.votes / totalShares) * 100 >= quorum, 'Cannot execute proposal with votes # below quorum');
     _transferEther(proposal.amount, proposal.recipient);
   }
 
@@ -121,7 +120,7 @@ contract DAO {
   }
   
   function _transferEther(uint amount, address payable to) internal {
-    require(amount <= availableFunds, 'not enough availableFunds');
+    require(amount <= availableFunds, 'Not enough available funds!');
     availableFunds -= amount;
     to.transfer(amount);
   }
@@ -136,8 +135,8 @@ contract DAO {
 // DEPLOYMENT
 // 1. Deploy contract as referred admin address with constructor arguments of 'contribution time, voting time, quorum percentage'
 
-// INTERACTION - TO BECOME AN INVESTOR
-// 1. Change address to desired address to become investor. Make sure you're within contribution time and add value in Ether to contribute and click Contribute function
+// INTERACTION - TO BECOME INVESTOR
+// 1. Change address to desired address to become investor, add value in Ether to contribbute and click Contribute function
 
-// INTERACTION - CREATE PROPOSAL
+// INTERACTION - CREATE proposal
 // 1. As an eligible investor, go to createProposal function with agruments of '"constribution type", amount in WEI to propose, "recipient address"'
