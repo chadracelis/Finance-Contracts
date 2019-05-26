@@ -1,6 +1,6 @@
 pragma solidity ^0.5.2;
 
-/*
+/**
  * DAO contract:
  * 1. Collects investors money (ether) & allocate shares
  * 2. Keep track of investor contributions with shares
@@ -25,7 +25,7 @@ contract DAO {
   uint public totalShares;
   uint public availableFunds;
   uint public contributionEnd;
-  uint public nextProposalId;
+  uint public nextProposalId = 1;
   uint public voteTime;
   uint public quorum;
 
@@ -58,14 +58,14 @@ contract DAO {
 
 
   function contribute() payable external {
-    require(now < contributionEnd, 'Contribution time hads ended');
+    require(now < contributionEnd, 'Contribution time has ended!');
     investors[msg.sender] = true;
     shares[msg.sender] += msg.value;
     totalShares += msg.value;
     availableFunds += msg.value;
   }
 
-  function redeemShare(uint amount) external {
+  function redeemShare(uint amount) external onlyInvestors() {
     require(shares[msg.sender] >= amount, 'Not enough shares');
     require(availableFunds >= amount, 'Not enough available funds');
     shares[msg.sender] -= amount;
