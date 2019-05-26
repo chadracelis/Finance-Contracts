@@ -1,7 +1,11 @@
 pragma solidity ^0.5.2;
 
-/**
- * DAO contract:
+// DAO Contract 
+// Allocate shares to Investors via Smart Contract equivalent by the amount in WEI contributed
+// Investors have priveledge and transferrable ownership of shares and voting on proposals
+// The more shares an investor owns, the more weight he carries on voting proposals
+
+/*
  * 1. Collects investors money (ether) & allocate shares
  * 2. Keep track of investor contributions with shares
  * 3. Allow investors to transfer shares
