@@ -1,0 +1,59 @@
+pragma solidity ^0.5.4;
+
+contract LoanMachine {
+    
+    enum loanStatus {
+        PENDING,
+        ACTIVE,
+        CLOSED
+    }
+    
+    loanStatus public status = loanStatus.PENDING;
+    uint public amount;
+    uint public interest;
+    uint public end;
+    address payable public borrower;
+    address payable public lender;
+    
+    constructor(
+        uint _amount,
+        uint _interest,
+        uint _duration,
+        address payable _borrower,
+        address payable _lender) 
+        public {
+            amount = _amount;
+            interest = _interest;
+            end = now + _duration;
+            borrower = _borrower;
+            lender = _lender;
+        }
+    
+    function fund() payable external {
+        require(msg.sender == lender, 'You are not the lender!');
+        require(address(this).balance == amount, 'Can only lend the exact amount');
+        _transitionTo(loanStatus.ACTIVE);
+        borrower.transfer(amount);
+    }
+    
+    function reimburse() payable external {
+        require(msg.sender == borrower, 'You are not the borrower!');
+        require(msg.value == amount + interest, 'Borrower needs to reimburse amount + interest');
+        _transitionTo(loanStatus.CLOSED);
+        lender.transfer(amount + interest);
+    }
+
+    function _transitionTo(loanStatus to) internal {
+      require(to != loanStatus.PENDING, 'Cannot go back to pending');
+      require(to != status, 'Cannot transition to same state');
+      if(to == loanStatus.ACTIVE) {
+        require(status == loanStatus.PENDING, 'Cannot go to active from pending');
+        status = loanStatus.ACTIVE;
+      }
+      if(to == loanStatus.CLOSED) {
+        require(status == loanStatus.ACTIVE, 'Cannot go to closed from active');
+        require(now >= end, 'Loan has not matured yet');
+        status = loanStatus.CLOSED;
+      }
+    }
+}
