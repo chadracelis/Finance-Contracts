@@ -18,6 +18,7 @@ contract Multisig {
     
     mapping(uint => Transfer) transfers;
     mapping(address => mapping(uint => bool)) approvals;
+    // address = approver, uint = Transfer Id, bool = approval
     
     constructor(address[] memory _approvers, uint _quorum) payable public {
         approvers = _approvers;
@@ -46,6 +47,7 @@ contract Multisig {
     }
     
     function sendTransfer(uint id) external onlyApprover {
+        require(transfers[id].id >= 1, 'Pending transfer does not exist');
         require(transfers[id].sent == false, 'Transfer has already been sent!');
         if(approvals[msg.sender][id] == false) {
           approvals[msg.sender][id] = true;
